@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "400857891860",
+    "project_id": "studiindependent-android",
+    "storage_bucket": "studiindependent-android.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:400857891860:android:2632c55e1c3dbf6bc6d301",
+        "android_client_info": {
+          "package_name": "id.pratama.week10firebase"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "400857891860-aa0oi3v525h42gp39csm3l2dftnq5j9v.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "id.pratama.week10firebase",
+            "certificate_hash": "83450969b9bc8b496665f91fe440253db3ba3961"
+          }
+        },
+        {
+          "client_id": "400857891860-cipghjl2nrc873r2sahbbaabv3tue369.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBzW5Y2QYAb7Qps6b-Ru6OrsAQuSYk9t5U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "400857891860-cipghjl2nrc873r2sahbbaabv3tue369.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
