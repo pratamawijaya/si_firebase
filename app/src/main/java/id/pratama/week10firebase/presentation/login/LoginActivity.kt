@@ -1,11 +1,13 @@
-package id.pratama.week10firebase
+package id.pratama.week10firebase.presentation.login
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
-import com.google.android.gms.auth.api.identity.BeginSignInRequest
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -16,11 +18,11 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import java.sql.Time
+import id.pratama.week10firebase.R
+import id.pratama.week10firebase.presentation.home.HomeActivity
 import java.util.Calendar
-import java.util.Date
 
-class MainActivity : AppCompatActivity() {
+class LoginActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
@@ -32,7 +34,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_login)
 
         // inisiasi button
         val btnSignIn = findViewById<SignInButton>(R.id.btnSignWithGoogle)
@@ -49,24 +51,21 @@ class MainActivity : AppCompatActivity() {
         // inisiasi firebase auth
         auth = Firebase.auth
 
-        val db = Firebase.firestore
+        // check apakah user sudah login sebelumnya
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            // user sudah login,
+            // navigate to home
+            startActivity(Intent(this@LoginActivity, HomeActivity::class.java))
+            finish()
+        }
 
-        //
         btnSignIn.setOnClickListener {
-            val currentTime = Calendar.getInstance().time
-            db.collection("times").add(TestObj(currentTime = currentTime.time))
-
-            db.collection("currentTime").document("current")
-                .set(TestObj(currentTime = currentTime.time))
-
             val signInIntent = googleSignInClient.signInIntent
             startActivityForResult(signInIntent, RC_GOOGLE_SIGNIN)
         }
-
     }
 
-
-    data class TestObj(val currentTime: Long)
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -103,6 +102,9 @@ class MainActivity : AppCompatActivity() {
                         Toast.LENGTH_SHORT
                     )
                         .show()
+
+                    startActivity(Intent(this@LoginActivity, HomeActivity::class.java))
+                    finish()
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w("pratama_tag", "signInWithCredential:failure", task.exception)
