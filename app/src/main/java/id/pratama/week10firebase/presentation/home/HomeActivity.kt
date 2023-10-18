@@ -1,20 +1,23 @@
 package id.pratama.week10firebase.presentation.home
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.google.type.DateTime
+import com.xwray.groupie.GroupieAdapter
 import id.pratama.week10firebase.R
 import id.pratama.week10firebase.model.Note
 import id.pratama.week10firebase.presentation.add_note.AddNoteActivity
+import id.pratama.week10firebase.presentation.home.rvitem.NoteRvItem
 import id.pratama.week10firebase.presentation.login.LoginActivity
-import java.util.Date
 
 class HomeActivity : AppCompatActivity() {
 
@@ -28,6 +31,8 @@ class HomeActivity : AppCompatActivity() {
 
     private val listNotes = mutableListOf<Note>()
 
+    private val adapter = GroupieAdapter()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +40,9 @@ class HomeActivity : AppCompatActivity() {
 
         val btnLogout = findViewById<Button>(R.id.btnLogout)
         val btnAddNote = findViewById<FloatingActionButton>(R.id.btnAddNote)
+        val rvNotes = findViewById<RecyclerView>(R.id.recyclerView)
+        rvNotes.layoutManager = LinearLayoutManager(this)
+        rvNotes.adapter = adapter
 
         btnAddNote.setOnClickListener {
             startActivity(Intent(this, AddNoteActivity::class.java))
@@ -47,31 +55,40 @@ class HomeActivity : AppCompatActivity() {
         }
 
         val currentUser = Firebase.auth.currentUser
-        db.collection(PATH_NOTES).document(currentUser?.uid ?: "")
+
+        val dataRef = db.collection(PATH_NOTES).document(currentUser?.uid ?: "")
             .collection(PATH_USER_NOTES)
             .orderBy("createdAt")
-            .get()
-            .addOnSuccessListener {
+
+
+        // kita listen perubahan data yang ada di firestore
+        dataRef.addSnapshotListener { value, error ->
+            val documents = value?.documents
+
+            documents?.let {
+                listNotes.clear()
+                adapter.clear()
                 it.map { qDoc ->
                     Log.d("tag", "hasil -> ${qDoc.data.toString()}")
-                    val docTimeStamp = qDoc.data["createdAt"] as com.google.firebase.Timestamp
+                    val docTimeStamp = qDoc.data!!["createdAt"] as Timestamp
                     listNotes.add(
                         Note(
-                            judul = qDoc.data["judul"].toString(),
-                            deskripsi = qDoc.data["deskripsi"].toString(),
+                            judul = qDoc.data!!["judul"].toString(),
+                            deskripsi = qDoc.data!!["deskripsi"].toString(),
                             createdAt = docTimeStamp.toDate()
                         )
                     )
                 }
 
-                Log.d("tag", "selesai mapping listNotes hasil -> ${listNotes.size}")
-                listNotes.map {
-                    Log.d("tag", "data -> $it")
+                listNotes.map { note ->
+                    Log.d("tag", "data -> $note")
+                    adapter.add(NoteRvItem(note))
                 }
+            }
 
-            }
-            .addOnFailureListener {
-                Log.e("tag", "error -> ${it.localizedMessage}")
-            }
+
+        }
+
+
     }
 }
