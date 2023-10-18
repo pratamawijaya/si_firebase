@@ -1,10 +1,10 @@
 package id.pratama.week10firebase.presentation.add_note
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
+import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -32,6 +32,7 @@ class AddNoteActivity : AppCompatActivity() {
         btnSimpan.setOnClickListener {
             val judul = inputJudul.text.toString()
             val desc = inputDesc.text.toString()
+
             val currentUser = Firebase.auth.currentUser
 
             val note = Note(
@@ -45,10 +46,12 @@ class AddNoteActivity : AppCompatActivity() {
                 "email" to "${currentUser?.email}"
             )
 
+            // data field
             db.collection(PATH_NOTES)
                 .document(currentUser?.uid ?: "")
                 .set(dataUser)
 
+            // data collection
             db.collection(PATH_NOTES)
                 .document(currentUser?.uid ?: "")
                 .collection(PATH_USER_NOTES)

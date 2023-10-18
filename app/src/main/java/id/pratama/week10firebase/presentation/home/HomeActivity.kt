@@ -65,9 +65,13 @@ class HomeActivity : AppCompatActivity(), NoteRvItemListener {
         // kita listen perubahan data yang ada di firestore
         dataRef.addSnapshotListener { value, error ->
             val documents = value?.documents
+
+
             documents?.let {
+                // jika sudah ada data sebelumnya, clear data terlebih dahulu
                 listNotes.clear()
                 adapter.clear()
+                //
                 it.map { qDoc ->
                     Log.d("tag", "hasil -> ${qDoc.data.toString()}")
                     val docTimeStamp = qDoc.data!!["createdAt"] as Timestamp
