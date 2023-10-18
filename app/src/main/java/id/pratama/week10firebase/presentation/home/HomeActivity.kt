@@ -17,9 +17,10 @@ import id.pratama.week10firebase.R
 import id.pratama.week10firebase.model.Note
 import id.pratama.week10firebase.presentation.add_note.AddNoteActivity
 import id.pratama.week10firebase.presentation.home.rvitem.NoteRvItem
+import id.pratama.week10firebase.presentation.home.rvitem.NoteRvItemListener
 import id.pratama.week10firebase.presentation.login.LoginActivity
 
-class HomeActivity : AppCompatActivity() {
+class HomeActivity : AppCompatActivity(), NoteRvItemListener {
 
 
     private val db = Firebase.firestore
@@ -64,7 +65,6 @@ class HomeActivity : AppCompatActivity() {
         // kita listen perubahan data yang ada di firestore
         dataRef.addSnapshotListener { value, error ->
             val documents = value?.documents
-
             documents?.let {
                 listNotes.clear()
                 adapter.clear()
@@ -73,6 +73,7 @@ class HomeActivity : AppCompatActivity() {
                     val docTimeStamp = qDoc.data!!["createdAt"] as Timestamp
                     listNotes.add(
                         Note(
+                            id = qDoc.id,
                             judul = qDoc.data!!["judul"].toString(),
                             deskripsi = qDoc.data!!["deskripsi"].toString(),
                             createdAt = docTimeStamp.toDate()
@@ -82,7 +83,7 @@ class HomeActivity : AppCompatActivity() {
 
                 listNotes.map { note ->
                     Log.d("tag", "data -> $note")
-                    adapter.add(NoteRvItem(note))
+                    adapter.add(NoteRvItem(note, this))
                 }
             }
 
@@ -90,5 +91,23 @@ class HomeActivity : AppCompatActivity() {
         }
 
 
+    }
+
+    override fun onItemDeleted(docId: String?) {
+        docId?.let {
+            Log.d("tag", "delet data with id -> $docId")
+            val currentUser = Firebase.auth.currentUser
+            db.collection(PATH_NOTES)
+                .document(currentUser?.uid ?: "")
+                .collection(PATH_USER_NOTES)
+                .document(docId)
+                .delete()
+                .addOnSuccessListener {
+                    Log.d("tag", "success delete data with id $docId")
+                }
+                .addOnFailureListener {
+                    Log.e("tag", "gagal delete data ${it.localizedMessage}")
+                }
+        }
     }
 }

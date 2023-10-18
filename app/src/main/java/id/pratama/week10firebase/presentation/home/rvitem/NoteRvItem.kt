@@ -6,11 +6,22 @@ import id.pratama.week10firebase.R
 import id.pratama.week10firebase.databinding.ItemNotesBinding
 import id.pratama.week10firebase.model.Note
 
-class NoteRvItem(private val note: Note) : BindableItem<ItemNotesBinding>() {
+interface NoteRvItemListener {
+    fun onItemDeleted(docId: String?)
+}
+
+class NoteRvItem(
+    private val note: Note,
+    private val listener: NoteRvItemListener
+) :
+    BindableItem<ItemNotesBinding>() {
     override fun bind(viewBinding: ItemNotesBinding, position: Int) {
         viewBinding.tvTitle.text = note.judul
         viewBinding.tvDesc.text = note.deskripsi
         viewBinding.tvCreatedAt.text = note.createdAt.toString()
+        viewBinding.btnDelete.setOnClickListener {
+            listener.onItemDeleted(note.id)
+        }
     }
 
     override fun getLayout(): Int {
