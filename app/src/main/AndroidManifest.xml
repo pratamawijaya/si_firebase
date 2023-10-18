@@ -15,6 +15,9 @@
         android:theme="@style/Theme.Week10Firebase"
         tools:targetApi="31">
         <activity
+            android:name=".presentation.add_note.AddNoteActivity"
+            android:exported="false" />
+        <activity
             android:name=".presentation.login.LoginActivity"
             android:exported="true">
             <intent-filter>
