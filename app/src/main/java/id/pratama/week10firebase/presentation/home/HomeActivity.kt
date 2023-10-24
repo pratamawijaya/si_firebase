@@ -57,6 +57,7 @@ class HomeActivity : AppCompatActivity(), NoteRvItemListener {
 
         val currentUser = Firebase.auth.currentUser
 
+
         val dataRef = db.collection(PATH_NOTES).document(currentUser?.uid ?: "")
             .collection(PATH_USER_NOTES)
             .orderBy("createdAt")
